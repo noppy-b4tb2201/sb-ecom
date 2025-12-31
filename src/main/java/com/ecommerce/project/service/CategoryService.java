@@ -1,8 +1,8 @@
 package com.ecommerce.project.service;
-
 import com.ecommerce.project.model.Category;
-
 import java.util.List;
+
+//カテゴリー操作を行うインターフェース
 
 public interface CategoryService {
     List<Category> getALLCategories();

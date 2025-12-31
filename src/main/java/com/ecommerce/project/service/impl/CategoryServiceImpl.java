@@ -5,26 +5,30 @@ import com.ecommerce.project.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.ArrayList;
 import java.util.List;
+
+//カテゴリー操作を行うメソッド
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
     private List<Category> categories = new ArrayList<>();
     private Long nextId = 1L;
 
+    //現在のすべてのカテゴリーを表示
     @Override
     public List<Category> getALLCategories() {
         return categories;
     }
 
+    //カテゴリー追加
     @Override
     public void createCategory(Category category) {
         category.setCategoryId(nextId++);
         categories.add(category);
     }
 
+    //カテゴリー削除
     @Override
     public String deleteCategory(Long categoryId) {
         Category category = categories.stream()
