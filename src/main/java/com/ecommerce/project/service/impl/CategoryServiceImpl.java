@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 //カテゴリー操作を行うメソッド
 
@@ -28,15 +29,33 @@ public class CategoryServiceImpl implements CategoryService {
         categories.add(category);
     }
 
+    //カテゴリーの更新
+    @Override
+    public Category updateCategory(Category category, Long categoryId) {
+        Optional<Category> category_updated = categories.stream()
+                                                       .filter(c -> c.getCategoryId().equals(categoryId))
+                                                       .findFirst();
+
+        if (category_updated.isPresent()) {
+            Category exisitingCategory = category_updated.get();
+            exisitingCategory.setCategoryName(category.getCategoryName());
+
+            return exisitingCategory;
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "category not found");
+        }
+    }
+
     //カテゴリー削除
     @Override
     public String deleteCategory(Long categoryId) {
-        Category category = categories.stream()
+        Category category_deleted = categories.stream()
                                       .filter(c -> c.getCategoryId().equals(categoryId))
                                       .findFirst()
                                       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                               "category not found"));
-        categories.remove(category);
+        categories.remove(category_deleted);
         return "category with categoryId:" + categoryId + " deleted successfully";
     }
 }
