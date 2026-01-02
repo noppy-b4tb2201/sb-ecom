@@ -15,7 +15,6 @@ import java.util.Optional;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
-    private List<Category> categories = new ArrayList<>();
 
     //CategoryRepositoryのBeanを自動注入
     @Autowired
@@ -36,6 +35,10 @@ public class CategoryServiceImpl implements CategoryService {
     //カテゴリーの更新
     @Override
     public Category updateCategory(Category category, Long categoryId) {
+
+        //カテゴリーを全取得し、リスト配列に格納
+        List<Category> categories = categoryRepository.findAll();
+
         //categoryIdに一致するカテゴリーを見つける
         Optional<Category> category_updated = categories.stream()
                                                        .filter(c -> c.getCategoryId().equals(categoryId))
@@ -57,6 +60,9 @@ public class CategoryServiceImpl implements CategoryService {
     //カテゴリー削除
     @Override
     public String deleteCategory(Long categoryId) {
+
+        //カテゴリーを全取得し、リスト配列に格納
+        List<Category> categories = categoryRepository.findAll();
 
         //categoryIdに一致するカテゴリーを見つける、見つからなければ例外を返す
         Category category_deleted = categories.stream()
