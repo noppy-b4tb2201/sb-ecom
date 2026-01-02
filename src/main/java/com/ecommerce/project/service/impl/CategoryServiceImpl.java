@@ -32,44 +32,33 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository.save(category);
     }
 
-    //カテゴリーの更新
+    //カテゴリーIDの更新
     @Override
     public Category updateCategory(Category category, Long categoryId) {
 
-        //カテゴリーを全取得し、リスト配列に格納
-        List<Category> categories = categoryRepository.findAll();
+        //データベースにアクセスし、categoryIdに一致するカテゴリーを取得、見つからなければ例外を返す
+        Category category_updated = categoryRepository.findById(categoryId)
+                .orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                "category not found"));
 
-        //categoryIdに一致するカテゴリーを見つける
-        Optional<Category> category_updated = categories.stream()
-                                                       .filter(c -> c.getCategoryId().equals(categoryId))
-                                                       .findFirst();
+        //引数として受け渡されたカテゴリーにカテゴリーIDを設定
+        category.setCategoryId(categoryId);
 
-        //一致するカテゴリーを見つけたらexisitingCategory変数を仲介して値を更新する
-        //見つからなければ例外を返す
-        if (category_updated.isPresent()) {
-            Category exisitingCategory = category_updated.get();
-            exisitingCategory.setCategoryName(category.getCategoryName());
+        //カテゴリーを上書きし、データベースに保存
+        category_updated = categoryRepository.save(category);
 
-            return categoryRepository.save(exisitingCategory);
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "category not found");
-        }
+        //更新されたカテゴリーを返す
+        return categoryRepository.save(category_updated);
     }
 
     //カテゴリー削除
     @Override
     public String deleteCategory(Long categoryId) {
 
-        //カテゴリーを全取得し、リスト配列に格納
-        List<Category> categories = categoryRepository.findAll();
-
-        //categoryIdに一致するカテゴリーを見つける、見つからなければ例外を返す
-        Category category_deleted = categories.stream()
-                                      .filter(c -> c.getCategoryId().equals(categoryId))
-                                      .findFirst()
-                                      .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                              "category not found"));
+        //データベースにアクセスし、categoryIdに一致するカテゴリーを取得、見つからなければ例外を返す
+        Category category_deleted = categoryRepository.findById(categoryId)
+                                                      .orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                                              "category not found"));
 
         //見つかれば削除する
         categoryRepository.delete(category_deleted);
