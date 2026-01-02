@@ -15,6 +15,7 @@ import java.util.List;
 @RequestMapping("/api")
 public class CategoryController {
 
+    //CategoryServiceのBeanを自動注入
     @Autowired
     private CategoryService categoryService;
 

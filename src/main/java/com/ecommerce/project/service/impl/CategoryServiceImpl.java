@@ -23,7 +23,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     //現在のすべてのカテゴリーを表示
     @Override
-    public List<Category> getALLCategories() {
+    public List<Category> getALLCategories()  {
         return categoryRepository.findAll();
     }
 
