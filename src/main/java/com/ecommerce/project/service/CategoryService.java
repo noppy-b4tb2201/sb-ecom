@@ -8,7 +8,7 @@ import java.util.List;
 //カテゴリー操作を行うインターフェース
 
 public interface CategoryService {
-    CategoryResponse getALLCategories();
+    CategoryResponse getALLCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
     CategoryDTO createCategory(CategoryDTO categoryDTO);
 
