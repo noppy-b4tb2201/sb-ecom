@@ -1,11 +1,14 @@
 package com.ecommerce.project.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.modelmapper.internal.bytebuddy.build.ToStringPlugin;
 
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
 @Table(name = "roles")
 public class Role {
@@ -15,6 +18,7 @@ public class Role {
     @Column(name = "role_id")
     private Integer roleId;
 
+    @ToStringPlugin.Exclude
     @Enumerated(EnumType.STRING)
     @Column(length = 20, name = "role_name")
     private AppRole roleName;
