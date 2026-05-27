@@ -1,5 +1,4 @@
 package com.ecommerce.project.security.jwt;
-import org.jspecify.annotations.Nullable;
 
 public class LoginRequest {
 
