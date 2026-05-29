@@ -42,10 +42,13 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    public User(String passowrd, String email, String userName) {
-        this.password = passowrd;
-        this.email = email;
+    public User(String userName,
+                String email,
+                String password) {
+
         this.userName = userName;
+        this.email = email;
+        this.password = password;
     }
 
     @Setter
