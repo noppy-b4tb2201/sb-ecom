@@ -2,10 +2,12 @@ package com.ecommerce.project.service.impl;
 
 import com.ecommerce.project.exception.APIException;
 import com.ecommerce.project.exception.ResourceNotFoundException;
+import com.ecommerce.project.model.Cart;
 import com.ecommerce.project.model.Category;
 import com.ecommerce.project.model.Product;
 import com.ecommerce.project.payload.ProductDTO;
 import com.ecommerce.project.payload.ProductResponse;
+import com.ecommerce.project.repository.CartRepository;
 import com.ecommerce.project.repository.CategoryRepository;
 import com.ecommerce.project.repository.ProductRepository;
 import com.ecommerce.project.service.FileService;
@@ -24,6 +26,9 @@ import java.util.List;
 
 @Service
 public class ProductServiceImpl implements ProductService {
+
+    @Autowired
+    CartRepository cartRepository;
 
     @Autowired
     private ProductRepository productRepository;
@@ -178,6 +183,8 @@ public class ProductServiceImpl implements ProductService {
 
         // Save to database
         Product savedProduct = productRepository.save(productFromDb);
+
+        List<Cart> carts = cartRepository.findCartsByProductId(productId);
 
         return modelMapper.map(savedProduct, ProductDTO.class);
     }

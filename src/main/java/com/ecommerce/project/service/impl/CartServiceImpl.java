@@ -167,13 +167,23 @@ public class CartServiceImpl implements CartService {
             throw new APIException(product.getProductName() + " not available");
         }
 
-        cartItem.setProductprice(product.getSpecialPrice());
-        cartItem.setQuantity(cartItem.getQuantity() + delete);
+        int newQuantity = cartItem.getQuantity() + delete;
 
-        cartItem.setDiscount(product.getDiscount());
-        cart.setTotalPrice(cart.getTotalPrice() + (cartItem.getProductprice() * delete));
+        if (newQuantity < 0) {
+            throw new APIException("Quantity cannot be negative");
+        }
 
-        cartRepository.save(cart);
+        if (newQuantity == 0) {
+            deleteProductFromcart(cartId, productId);
+        } else {
+            cartItem.setProductprice(product.getSpecialPrice());
+            cartItem.setQuantity(cartItem.getQuantity() + delete);
+
+            cartItem.setDiscount(product.getDiscount());
+            cart.setTotalPrice(cart.getTotalPrice() + (cartItem.getProductprice() * delete));
+
+            cartRepository.save(cart);
+        }
 
         CartItem updatedItem = cartItemRepository.save(cartItem);
 
@@ -194,6 +204,27 @@ public class CartServiceImpl implements CartService {
         cartDTO.setProducts(productDTOStream.toList());
         return cartDTO;
     }
+
+    @Transactional
+    @Override
+    public String deleteProductFromcart(Long cartId, Long productId) {
+        Cart cart = cartRepository.findById(cartId).
+                                  orElseThrow(() -> new ResourceNotFoundException("cart", "cartId", cartId));
+
+        CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(cartId, productId);
+
+        if (cartItem == null) {
+            throw new ResourceNotFoundException("Product", "productId", productId);
+        }
+
+        cart.setTotalPrice(cart.getTotalPrice() -
+                (cartItem.getProductprice() * cartItem.getQuantity()));
+
+        cartItemRepository.deleteCartItemByProductIdAndcartId(cartId, productId);
+
+        return "Product" + cartItem.getProduct().getProductName() + "removed from the cart";
+    }
+
 
     private Cart createCart() {
 
