@@ -5,7 +5,9 @@ import com.ecommerce.project.model.Address;
 import com.ecommerce.project.model.User;
 import com.ecommerce.project.payload.AddressDTO;
 import com.ecommerce.project.repository.AddressRepository;
+import com.ecommerce.project.repository.UserRepository;
 import com.ecommerce.project.service.AddressService;
+import com.ecommerce.project.util.AuthUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,12 @@ public class AddressServiceImpl implements AddressService {
 
     @Autowired
     AddressRepository addressRepository;
+
+    @Autowired
+    AuthUtil authUtil;
+
+    @Autowired
+    UserRepository userRepository;
 
     @Override
     public AddressDTO createAddress(AddressDTO addressDTO, User user) {
@@ -53,5 +61,53 @@ public class AddressServiceImpl implements AddressService {
         Address address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new ResourceNotFoundException("Address", "AddressId", addressId));
         return modelMapper.map(address, AddressDTO.class);
+    }
+
+    @Override
+    public List<AddressDTO> getUserAddresses(User user) {
+        List<Address> addresses = user.getAddresses();
+        List<AddressDTO> addressDTOS = addresses.stream()
+                                                .map(address -> modelMapper.map(address, AddressDTO.class))
+                                                .collect(Collectors.toList());
+
+        return addressDTOS;
+    }
+
+    @Override
+    public AddressDTO updateAddress(Long addressId, AddressDTO addressDTO) {
+        Address addressFromdatabase = addressRepository.findById(addressId)
+                                                       .orElseThrow(() -> new ResourceNotFoundException("Address", "AddressId", addressId));
+
+        addressFromdatabase.setCity(addressDTO.getCity());
+        addressFromdatabase.setPincode(addressDTO.getPincode());
+        addressFromdatabase.setState(addressDTO.getState());
+        addressFromdatabase.setCountry(addressDTO.getCountry());
+        addressFromdatabase.setStreet(addressDTO.getStreet());
+        addressFromdatabase.setBuildingName(addressDTO.getBuildingName());
+
+        Address updatedAddress = addressRepository.save(addressFromdatabase);
+
+        User user = addressFromdatabase.getUser();
+        user.getAddresses().removeIf(address -> address.getAddressId().equals(addressId));
+        user.getAddresses().add(updatedAddress);
+
+        userRepository.save(user);
+
+        return modelMapper.map(updatedAddress, AddressDTO.class);
+    }
+
+    @Override
+    public String deleteAddress(Long addressId) {
+        Address addressFromdatabase = addressRepository.findById(addressId)
+                                                       .orElseThrow(() -> new ResourceNotFoundException("Address", "AddressId", addressId));
+
+        User user = addressFromdatabase.getUser();
+        user.getAddresses().removeIf(address -> address.getAddressId().equals(addressId));
+
+        userRepository.save(user);
+
+        addressRepository.delete(addressFromdatabase);
+
+        return "Address deleted successfully with addressId " + addressId;
     }
 }
